@@ -1,0 +1,51 @@
+/* Hutton Colour Palette
+   Generated from HuttonPallette.png
+   CMYK / RGB source values noted in comments for reference */
+
+:root {
+  /* Primary colours (from logo) */
+  --hutton-purple: #872175; /* C50 M100 Y15 K10 | R135 G33 B117 */
+  --hutton-green:  #78a22f; /* C45 M0  Y100 K24 | R120 G162 B47 */
+  --hutton-blue:   #509bbe; /* C52 M6  Y0   K25 | R86  G155 B190 */
+
+  /* Secondary colours */
+  --hutton-orange:      #e88203; /* C7  M58 Y100 K0  | R232 G130 B3 */
+  --hutton-alt-green:   #687f28; /* C62 M32 Y100 K15 | R105 G128 B41 */
+  --hutton-alt-blue:    #427c9e; /* C77 M43 Y25  K2  | R66  G124 B158 */
+
+  --hutton-dark-orange: #b16116; /* C24 M67 Y100 K12 | R177 G97  B34 */
+  --hutton-dark-green:  #03574a; /* C90 M42 Y70  K3  | R3   G87  B74 */
+  --hutton-dark-blue:   #1c4273; /* C98 M81 Y29  K15 | R28  G66  B115 */
+
+  --hutton-brown:    #804514; /* C34 M73 Y100 K33 | R128 G69  B20 */
+  --hutton-dark-red: #911733; /* C28 M100 Y75 K26 | R145 G23  B51 */
+  --hutton-grey:     #767474; /* C55 M47 Y47  K12 | R118 G116 B116 */
+}
+
+/* Text colour utility classes */
+.text-hutton-purple      { color: var(--hutton-purple); }
+.text-hutton-green       { color: var(--hutton-green); }
+.text-hutton-blue        { color: var(--hutton-blue); }
+.text-hutton-orange      { color: var(--hutton-orange); }
+.text-hutton-alt-green   { color: var(--hutton-alt-green); }
+.text-hutton-alt-blue    { color: var(--hutton-alt-blue); }
+.text-hutton-dark-orange { color: var(--hutton-dark-orange); }
+.text-hutton-dark-green  { color: var(--hutton-dark-green); }
+.text-hutton-dark-blue   { color: var(--hutton-dark-blue); }
+.text-hutton-brown       { color: var(--hutton-brown); }
+.text-hutton-dark-red    { color: var(--hutton-dark-red); }
+.text-hutton-grey        { color: var(--hutton-grey); }
+
+/* Background colour utility classes */
+.bg-hutton-purple      { background-color: var(--hutton-purple); }
+.bg-hutton-green       { background-color: var(--hutton-green); }
+.bg-hutton-blue        { background-color: var(--hutton-blue); }
+.bg-hutton-orange      { background-color: var(--hutton-orange); }
+.bg-hutton-alt-green   { background-color: var(--hutton-alt-green); }
+.bg-hutton-alt-blue    { background-color: var(--hutton-alt-blue); }
+.bg-hutton-dark-orange { background-color: var(--hutton-dark-orange); }
+.bg-hutton-dark-green  { background-color: var(--hutton-dark-green); }
+.bg-hutton-dark-blue   { background-color: var(--hutton-dark-blue); }
+.bg-hutton-brown       { background-color: var(--hutton-brown); }
+.bg-hutton-dark-red    { background-color: var(--hutton-dark-red); }
+.bg-hutton-grey        { background-color: var(--hutton-grey); }

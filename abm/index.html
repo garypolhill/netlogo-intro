@@ -1,0 +1,1317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>ESSA Summer School 2026</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="https://www.hutton.ac.uk/wp-content/uploads/2024/02/cropped-favicon-270x270.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Open+Sans:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- Reveal.js (CDN) -->
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@5/dist/reveal.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@5/dist/theme/white.css" id="theme">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@5/plugin/highlight/monokai.css" />
+  <link rel="stylesheet" href="hutton/hutton-colours.css" />
+  <style>
+    .reveal { font-size: 18px; text-align: left; }
+    .reveal .slides section { text-align: left; }
+
+    /* -------------------------
+    Theme tokens
+    --------------------------*/
+    :root{
+
+      --body-bottom-h: 90px;
+      --final-top-h: 95vh;
+      --title-cover-bottom: 0px;  /* clearance from the real viewport's bottom edge */
+      --title-cover-size: 330px;   /* ribbon is roughly square, so one var covers width+height */
+      --bib-top-w: 950px;  /* bibliography-slide's top-right graphic */
+      --bib-top-h: 150px;
+
+      /* Badge row layout knobs */
+      --badge-row-bottom: 20px;  /* distance of the whole row from the bottom of the viewport */
+      --badge-row-h: 90px;       /* height of the badge strip itself (half-size) */
+
+      /* Per-badge tuning: size, anchor position, and a fine px nudge for each logo.
+         "contain" is used for all six so each logo keeps its own aspect
+         ratio without manual per-shape percentage tuning; nudge individual
+         ones with --badge-N-offset-y. */
+      --badge-1-size: contain;
+      --badge-1-pos: center center;
+      --badge-1-offset-y: 0px;
+
+      --badge-2-size: contain;
+      --badge-2-pos: center center;
+      --badge-2-offset-y: 0px;
+
+      --badge-3-size: contain;
+      --badge-3-pos: center center;
+      --badge-3-offset-y: 0px;
+
+      --badge-4-size: contain;
+      --badge-4-pos: center center;
+      --badge-4-offset-y: 0px;
+
+      --badge-5-size: contain;
+      --badge-5-pos: center center;
+      --badge-5-offset-y: 0px;
+
+      --badge-6-size: contain;
+      --badge-6-pos: center center;
+      --badge-6-offset-y: 0px;
+
+      /* Brand colours now come from css/hutton-colours.css (--hutton-purple,
+         --hutton-green, --hutton-grey, etc.) rather than being redefined
+         here. --hutton-white isn't part of that shared palette (it's just
+         plain white), so it's kept as a small local convenience variable. */
+      --hutton-white: #ffffff;
+
+      /* Reveal defaults we override */
+      --r-background-color: var(--hutton-white);
+      --r-main-font: Carlito, Calibri, "Segoe UI", Arial, sans-serif;
+      --r-main-color: var(--hutton-grey);
+      --r-heading-font: "Open Sans", Calibri, "Segoe UI", Arial, sans-serif;
+      --r-heading-color: var(--hutton-grey);
+      --r-link-color: var(--hutton-green);
+      --r-link-color-hover: rgb(98,134,40);
+      --r-selection-background-color: rgba(120,162,47,.35);
+
+      /* Layout scaling knobs */
+      --h-pad: 3.5vw;
+      --v-pad: 3.0vh;
+
+      /* Assets (adjust paths if you put images elsewhere) */
+      --hutton-cover-image: url("hutton/Hutton_cover_Web.png");
+      --hutton-top-block: url("hutton/final-slide-top.png");
+      --hutton-bottom-image: url("hutton/body-bottom.png");
+      --hutton-bottom-purple-image: url("hutton/body-bottom-purple.png");
+      --hutton-reference-top-image: url("hutton/reference-top.png");
+      --hutton-logo-image: url("hutton/hutton-logo.png");
+      --hutton-dark-logo-image: url("hutton/hutton-logo-dark.png");
+      --hutton-badge-1: url("hutton/athena-swan-silver-award.png");
+      --hutton-badge-2: url("hutton/disability-confident-employer.png");
+      --hutton-badge-3: url("hutton/kae-sustainable-development.png");
+      --hutton-badge-4: url("hutton/living-wage-employer.png");
+      --hutton-badge-5: url("hutton/proud-employers-champion.png");
+      --hutton-badge-6: url("hutton/smallest-things-stamp.png")
+    }
+
+    /* --- pinned decorative graphics --- */
+    .decor-bottom,
+    .decor-bottom-purple,
+    .decor-top-right,
+    .decor-top-right-dark,
+    .decor-final-top,
+    .decor-title-cover,
+    .decor-bib-top,
+    .decor-final-logos,
+    .badge-row {
+      position: fixed;
+      z-index: 0;  /* above slide content */
+      pointer-events: none;  /* don't block clicks on slides */
+      display: none;  /* show only when appropriate */
+    }
+
+    /* bottom bar image pinned to viewport bottom */
+    .decor-bottom {
+      left: 0; right: 0; bottom: 0;
+      height: var(--body-bottom-h);
+      background: var(--hutton-bottom-image) bottom center / 100% 100% no-repeat;
+    }
+
+    /* right-image-slide-specific: same pinned bottom bar as .decor-bottom,
+       just a purple-toned image instead -- swapped in/out in updateDecor()
+       (see the isRightImage check) rather than every other default body
+       slide, which keeps the plain .decor-bottom. */
+    .decor-bottom-purple {
+      left: 0; right: 0; bottom: 0;
+      height: var(--body-bottom-h);
+      background: var(--hutton-bottom-purple-image) bottom center / 100% 100% no-repeat;
+    }
+
+    /* title-slide cover ribbon, pinned to the real viewport's bottom-right
+       corner (not the slide <section>'s box) so it doesn't get pushed
+       around by reveal's vertical-centering of short slide content --
+       same technique as .decor-bottom above. */
+    .decor-title-cover {
+      right: 30px; bottom: var(--title-cover-bottom);
+      width: var(--title-cover-size); height: var(--title-cover-size);
+      background: var(--hutton-cover-image) right bottom / contain no-repeat;
+    }
+
+    /* top-right image pinned to viewport corner (150% of the half-size version) */
+    .decor-top-right {
+      top: 30px; right: 30px;
+      width: 150px; height: 120px;
+      background: var(--hutton-logo-image) top right / contain no-repeat;
+    }
+
+    /* top-right dark image pinned to viewport corner (150% of the half-size version) */
+    .decor-top-right-dark {
+      top: 30px; right: 30px;
+      width: 150px; height: 120px;
+      z-index: 1;  /* sit above .decor-final-top even though it comes first in the DOM */
+      background: var(--hutton-dark-logo-image) top right / contain no-repeat;
+    }
+
+    /* final-slide-specific: replaces the single-logo .decor-top-right-dark
+       with a row of three (Hutton dark logo + the two "-reversed" partner
+       logos, all light-coloured variants meant for the purple banner
+       behind them). Plain <img> tags rather than fixed-box background
+       images, so each logo scales to the same height and keeps its own
+       natural aspect ratio for width, instead of all three being forced
+       into equal-width boxes. Own explicit position/display here, same
+       pattern as .badge-row above -- the shared hidden-by-default rule
+       only sets the initial state; updateDecor() toggles visibility with
+       inline styles regardless. */
+    .decor-final-logos {
+      top: 30px; right: 30px;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .decor-final-logos img {
+      height: 80px;
+      width: auto;
+      display: block;
+    }
+
+    /* bibliography-slide's top-right graphic, replacing the usual
+       .decor-bottom banner for this slide style. .decor-top-right-dark
+       (the dark logo) sits above it via that element's own z-index:1,
+       same layering final-slide already uses for .decor-final-top. */
+    .decor-bib-top {
+      top: 0; right: 0;
+      width: var(--bib-top-w); height: var(--bib-top-h);
+      background: var(--hutton-reference-top-image) top right / contain no-repeat;
+    }
+
+    /* final slide header image (flush to top) */
+    .decor-final-top {
+      left: 0; right: 0; top: 0;
+      height: var(--final-top-h);
+      background: var(--hutton-top-block) top center / 100% 90% no-repeat;
+    }
+
+    /* final slide header image (flush to bottom) */
+    .decor-badges {
+      left: 20px;
+      right: 20px;
+      bottom: 0;
+      height: 90px; /* adjust to match your footer image height */
+      background: var(--hutton-badges-image) bottom center / 90% 90% no-repeat;
+    }
+
+    .badge-row {
+      position: fixed;      /* or absolute, depending on your layout */
+      bottom: var(--badge-row-bottom);
+      left: 0;
+      width: 100%;
+      box-sizing: border-box; /* padding eats into the 100% width instead of adding beyond it -- otherwise the row overflows off the right edge by the padding amount */
+      height: var(--badge-row-h);
+      display: flex;
+      justify-content: flex-start;  /* cluster the logos as a group, anchored to the left */
+      align-items: flex-end;
+      gap: 1.5%;                  /* real, adjustable space BETWEEN the logos */
+      padding: 0 8% 0 2%;         /* left padding is the group's clearance from the edge */
+    }
+
+    .badge-row > div{
+      flex: 0 0 auto;      /* sized to its own box, not stretched to fill the row */
+      width: 10%;
+      height: 100%;
+     }
+
+    /* scale(0.75) shrinks each logo to 75% of its "contain"-fitted size */
+    .badge-row > div:nth-child(1) { background: var(--hutton-badge-1) var(--badge-1-pos) / var(--badge-1-size) no-repeat; transform: translateY(var(--badge-1-offset-y)) scale(0.75); }
+    .badge-row > div:nth-child(2) { background: var(--hutton-badge-2) var(--badge-2-pos) / var(--badge-2-size) no-repeat; transform: translateY(var(--badge-2-offset-y)) scale(0.75); }
+    .badge-row > div:nth-child(3) { background: var(--hutton-badge-3) var(--badge-3-pos) / var(--badge-3-size) no-repeat; transform: translateY(var(--badge-3-offset-y)) scale(0.75); }
+    .badge-row > div:nth-child(4) { background: var(--hutton-badge-4) var(--badge-4-pos) / var(--badge-4-size) no-repeat; transform: translateY(var(--badge-4-offset-y)) scale(0.75); }
+    .badge-row > div:nth-child(5) { background: var(--hutton-badge-5) var(--badge-5-pos) / var(--badge-5-size) no-repeat; transform: translateY(var(--badge-5-offset-y)) scale(0.75); }
+    .badge-row > div:nth-child(6) { background: var(--hutton-badge-6) var(--badge-6-pos) / var(--badge-6-size) no-repeat; transform: translateY(var(--badge-6-offset-y)) scale(0.75); }
+
+    /* tighten left alignment for all slides */
+    .reveal .slides section {
+      text-align: left;
+      padding-left: 0.75em !important;  /* reduce from Reveal’s default 4–5em */
+    }
+
+    /* ensure slide text above */
+    /* .reveal .slides { position: relative; z-index: 1; } */
+    /* lift navigation arrows slightly so they sit above the footer graphics */
+    .reveal .controls {
+    bottom: 110px !important; /* was ~20px; adjust if your banner height differs */
+}
+
+.container{
+    display: flex;
+}
+.col{
+    flex: 1;
+}
+
+/* Calm the default reveal heading spacing */
+.reveal .slides h1,
+.reveal .slides h2,
+.reveal .slides h3{
+  color: var(--hutton-green);
+  margin: 0 0 .35em 0;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+.reveal .slides h1{
+  color: var(--hutton-purple);
+}
+
+/* Typography tuned to poster template */
+.reveal .slides h1{
+  font-size: 2.2em;   /* maps loosely from ~96pt */
+  font-weight: 700;
+}
+
+/* A thin outline used in the template panels */
+.outline{
+  border: 4px solid var(--hutton-grey);
+  border-radius: 10px;
+  background: transparent;
+}
+
+/* Purple rounded callout (footer block in poster template) */
+.callout{
+  background: var(--hutton-purple);
+  color: var(--hutton-white);
+  border-radius: 28px;
+  padding: 0.9em 1.1em;
+}
+.callout *{ color: inherit; }
+
+/* The reveal container itself */
+.reveal {
+  background: transparent !important;
+}
+
+/* Optional: ensure slides don't paint white backgrounds */
+.reveal .slides section {
+  background: transparent !important;
+}
+ 
+
+/* -------------------------
+   FIX: coloured bullets + consistent heading colour (wins over theme)
+   --------------------------*/
+
+/* Headings: h1 titles are purple, h2/h3 are green -- deck-wide, with no
+   per-slide-style exceptions (see the title-slide h2 rule below, which
+   used to override this colour and no longer does). */
+.reveal .slides h2,
+.reveal .slides h3{
+  color: var(--hutton-green) !important;
+}
+.reveal .slides h1{
+  color: var(--hutton-purple) !important;
+}
+
+/* Font size/weight and the gradient rule underneath are still
+   title-slide-specific (so a plain "## Subtitle" gets that treatment
+   only on the title-slide, not on every ## elsewhere), but colour is
+   deliberately NOT overridden here any more -- it now falls through to
+   the global h2 rule above like every other heading in the deck. */
+.reveal .slides section.title-slide h2 {
+  font-size: 1.2em;
+  font-weight: 600;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(to right, var(--hutton-green), var(--hutton-blue), var(--hutton-purple)) 1;
+}
+
+/* Bullets: draw our own so themes can't neuter them */
+.reveal .slides ul{
+  list-style: none !important;
+  margin: 0.25em 0 0.25em 1.2em !important;
+  padding-left: 0 !important;
+}
+
+.reveal .slides ul li{
+  position: relative !important;
+  padding-left: 1.05em !important;
+  margin: 0 0 0.35em 0 !important;
+  line-height: 1.4;
+}
+
+.reveal .slides ul li::before{
+  content: "■";
+  position: absolute;
+  left: 0;
+  top: 0.02em;
+  color: var(--hutton-green) !important;
+  font-size: 1.15em;
+  line-height: 1.2;
+}
+
+/* 2nd-level bullets: smaller, hutton-green arrow (colour inherited from
+   the ul li::before rule above -- only content/size are overridden here). */
+.reveal .slides ul ul{
+  margin-left: 1.05em !important;
+}
+.reveal .slides ul ul li::before{
+  content: "▸";
+  font-size: 1.05em;
+}
+
+/* 3rd-level bullets: dash, same hutton-green (again inherited, not
+   redeclared). Higher selector specificity (one more "ul") than the
+   2nd-level rule above, so this wins for lists nested this deep. */
+.reveal .slides ul ul ul{
+  margin-left: 1.05em !important;
+}
+.reveal .slides ul ul ul li::before{
+  content: "–";
+  font-size: 1em;
+}
+
+/* Don't interfere with ordered lists */
+.reveal .slides ol li::before{
+  content: none !important;
+}
+
+/* =========================================================
+   NEW: on-screen "leave the deck" back button
+   (Alt+Left is intercepted by Reveal's keyboard handler, so
+   this calls window.history.back() directly from a click.)
+   ========================================================= */
+.deck-back-button {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 1000;              /* above everything, incl. title banner */
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.45em 0.9em 0.45em 0.7em;
+  border: none;
+  border-radius: 999px;
+  background: var(--hutton-grey, #4a4a4a);
+  color: #fff;
+  font-family: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.deck-back-button:hover,
+.deck-back-button:focus-visible {
+  opacity: 1;
+  transform: translateY(-1px);
+  background: var(--hutton-green, #628628);
+  outline: none;
+}
+.deck-back-button svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+/* Solid-colour-backdrop slides (final-slide's purple banner, and the
+   3 full-bleed section-*-slide dividers below): the button sits directly
+   on a photo banner or flat brand colour, so it needs to stand out more
+   at rest, and the usual green hover doesn't read well against purple/
+   green/blue -- swap to a white pill with black text instead. Scoped via
+   body classes toggled in updateDecor(), since .deck-back-button lives
+   outside the slide <section> in the DOM. */
+body.final-slide-active .deck-back-button,
+body.section-title-purple-active .deck-back-button,
+body.section-title-green-active .deck-back-button,
+body.section-title-blue-active .deck-back-button {
+  opacity: 0.85;
+}
+body.final-slide-active .deck-back-button:hover,
+body.final-slide-active .deck-back-button:focus-visible,
+body.section-title-purple-active .deck-back-button:hover,
+body.section-title-purple-active .deck-back-button:focus-visible,
+body.section-title-green-active .deck-back-button:hover,
+body.section-title-green-active .deck-back-button:focus-visible,
+body.section-title-blue-active .deck-back-button:hover,
+body.section-title-blue-active .deck-back-button:focus-visible {
+  background: var(--hutton-white, #fff);
+  color: #000;
+}
+/* Same reasoning for reveal's nav arrows (the arrows live in
+   .reveal .controls, outside the slide <section> too) -- white shows up
+   cleanly against all three brand colours (and the purple final-slide
+   banner already used its own colour choice, kept as-is). */
+body.final-slide-active .reveal .controls {
+  color: var(--hutton-purple) !important;
+}
+body.section-title-purple-active .reveal .controls,
+body.section-title-green-active .reveal .controls,
+body.section-title-blue-active .reveal .controls {
+  color: var(--hutton-white) !important;
+}
+
+/* =========================================================
+   UPDATED: bibliography-slide — default style, small reference-list text
+   Headings are NOT resized here any more -- no local h1/h2/h3 override,
+   so they inherit exactly the same font-size as every other slide's
+   headings (the global rules further up this stylesheet). Only the
+   body text size is locally tuned, via the section's own font-size
+   (0.8em cascades to body text but not to headings, since headings set
+   their own font-size explicitly in the global rules -- that's what
+   makes this "aligned with global setting").
+   Body text (not headings, which keep --r-heading-font) uses Lora, an
+   open-licence (OFL) Google Font serif designed for dense body/citation
+   text -- distinct from the deck's sans-serif elsewhere, signalling
+   "this is reference material" the way a paper's bibliography usually
+   looks different from its body. */
+.reveal .slides section.bibliography-slide {
+  font-size: 0.8em;
+  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+}
+.reveal .slides section.bibliography-slide ul li {
+  margin-bottom: 0.5em;
+  line-height: 1.35;
+}
+
+/* =========================================================
+   NEW: right-image-slide / left-image-slide
+   Default style, page split into a text half and an image half.
+   Markdown authors always write:
+     <div class="split">
+       <div class="split-text">...</div>
+       <div class="split-image">...</div>
+     </div>
+   and the slide's class alone decides which side the image lands on.
+   ========================================================= */
+.reveal .slides section.right-image-slide .split,
+.reveal .slides section.left-image-slide .split {
+  display: flex;
+  align-items: center;
+  gap: 2.2em;
+  width: 100%;
+  min-height: 60vh;
+}
+.reveal .slides section.right-image-slide .split-text  { order: 1; flex: 1 1 0; }
+.reveal .slides section.right-image-slide .split-image { order: 2; flex: 1 1 0; }
+.reveal .slides section.left-image-slide  .split-image { order: 1; flex: 1 1 0; }
+.reveal .slides section.left-image-slide  .split-text  { order: 2; flex: 1 1 0; }
+
+.split-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.split-image img {
+  max-width: 100%;
+  max-height: 55vh;
+  display: block;
+  border-radius: 8px;
+}
+.split-text { padding: 0 0.5em; }
+
+/* left-image-slide-specific: h1 titles are hutton-blue here instead of
+   the deck-wide purple (see the global h1 rule further up), matching
+   the same slide-scoped-override pattern used elsewhere in this file. */
+.reveal .slides section.left-image-slide h1 {
+  color: var(--hutton-blue) !important;
+}
+
+/* =========================================================
+   NEW: hero-image -- one large hero image + up to 3 smaller supporting
+   thumbnails stacked beside it. No decor graphics on this one (see the
+   isHeroImage branch in updateDecor() below) -- the images are the sole
+   focus of the slide. Same manual-wrapper approach as .split above (not
+   auto-detected from markdown), for the same reason: it keeps authors
+   in full control of exactly which image is the hero vs. a thumbnail,
+   rather than guessing from document order. Markdown authors write:
+     <!-- .slide: class="hero-image" -->
+     ## Heading (optional, sits above the layout)
+
+     <div class="hero-thumbnails">
+     <div class="hero-photo"><img src="..." alt="..."></div>
+     <div class="thumbnail-stack">
+     <div class="thumbnail-image"><img src="..." alt="..."></div>
+     <div class="thumbnail-image"><img src="..." alt="..."></div>
+     <div class="thumbnail-image"><img src="..." alt="..."></div>
+     </div>
+     </div>
+   Fewer than 3 thumbnails works too (the stack just splits evenly
+   between however many are there); more than 3 will still lay out, just
+   increasingly cramped -- 3 is the capacity this template is designed
+   for, not a hard limit. (The hero container is named .hero-photo, not
+   .hero-image, so it can't collide with the slide's own "hero-image"
+   class -- a bare ".hero-image" rule would otherwise also match the
+   <section> itself.) */
+.reveal .slides section.hero-image .hero-thumbnails {
+  display: flex;
+  align-items: stretch;
+  gap: 1.2em;
+  width: 100%;
+  min-height: 60vh;
+}
+.hero-photo {
+  flex: 2 1 0;  /* roughly twice the width of the thumbnail column */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+.thumbnail-stack {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+}
+.thumbnail-image {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.thumbnail-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+/* =========================================================
+   NEW: section-title-purple / section-title-green / section-title-blue
+   Full-bleed "chapter divider" slides -- a solid Hutton brand colour
+   covering the ENTIRE real viewport (not just the slide's own content
+   box). Markdown authors just write:
+     <!-- .slide: class="section-title-purple" -->
+     # Section Title
+   The colour is applied to <body> itself (which reveal.js gives its own
+   "reveal-viewport" class and a hardcoded white background -- there's no
+   separate wrapper <div>, despite the class name suggesting one) via a
+   body class toggled in updateDecor() -- not a background on the slide
+   <section>. That's deliberate: a section-attached background gets
+   dragged around by reveal's vertical-centering of short slide content
+   (see the .decor-title-cover comment further up for the full
+   explanation of why), so it wouldn't reach the real edges of the
+   screen. <body> itself is unaffected by any of that -- it's always the
+   true full window size -- so colouring it is the robust way to get an
+   edge-to-edge background regardless of how little content the slide
+   has. */
+.reveal .slides section.section-title-purple,
+.reveal .slides section.section-title-green,
+.reveal .slides section.section-title-blue {
+  text-align: center;
+  padding-left: 0 !important;
+}
+.reveal .slides section.section-title-purple,
+.reveal .slides section.section-title-purple h1,
+.reveal .slides section.section-title-purple h2,
+.reveal .slides section.section-title-purple h3,
+.reveal .slides section.section-title-purple p,
+.reveal .slides section.section-title-purple li,
+.reveal .slides section.section-title-purple a,
+.reveal .slides section.section-title-green,
+.reveal .slides section.section-title-green h1,
+.reveal .slides section.section-title-green h2,
+.reveal .slides section.section-title-green h3,
+.reveal .slides section.section-title-green p,
+.reveal .slides section.section-title-green li,
+.reveal .slides section.section-title-green a,
+.reveal .slides section.section-title-blue,
+.reveal .slides section.section-title-blue h1,
+.reveal .slides section.section-title-blue h2,
+.reveal .slides section.section-title-blue h3,
+.reveal .slides section.section-title-blue p,
+.reveal .slides section.section-title-blue li,
+.reveal .slides section.section-title-blue a {
+  color: var(--hutton-white) !important;
+}
+.reveal .slides section.section-title-purple h1,
+.reveal .slides section.section-title-green h1,
+.reveal .slides section.section-title-blue h1 {
+  font-size: 3.2em;  /* larger font size and a chapter divider is meant to be bold */
+}
+/* The actual full-viewport colour fill -- see the big comment above.
+   No descendant combinator here: body IS the "reveal-viewport"-classed
+   element, so this has to be a compound selector on body itself, not
+   "body.section-title-purple-active .reveal-viewport" (which matches nothing,
+   since that class never appears on an actual descendant of body). */
+body.section-title-purple-active { background: var(--hutton-purple) !important; }
+body.section-title-green-active  { background: var(--hutton-green)  !important; }
+body.section-title-blue-active   { background: var(--hutton-blue)   !important; }
+
+/* =========================================================
+   NEW: pause-slide — humorous "be right back" holding slide
+   Custom message + countdown are supplied per-slide, see presentation.md
+   ========================================================= */
+.reveal .slides section.pause-slide {
+  text-align: center;
+  padding-left: 0 !important;
+}
+.reveal .slides section.pause-slide .pause-emoji {
+  font-size: 3.4em;
+  line-height: 1;
+  margin-bottom: 0.15em;
+}
+.reveal .slides section.pause-slide h1,
+.reveal .slides section.pause-slide h2 {
+  text-align: center;
+}
+.reveal .slides section.pause-slide p {
+  text-align: center;
+  font-size: 1.1em;
+  max-width: 34em;
+  margin: 0.4em auto;
+}
+.reveal .slides section.pause-slide .pause-timer {
+  margin-top: 0.6em;
+  font-size: 3em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--hutton-purple);
+}
+
+/* =========================================================
+   NEW: final-slide text — now sits entirely inside the purple
+   final-slide-top.png banner, so switch to white text throughout.
+   ========================================================= */
+.reveal .slides section.final-slide,
+.reveal .slides section.final-slide p,
+.reveal .slides section.final-slide a,
+.reveal .slides section.final-slide li {
+  color: var(--hutton-white) !important;
+}
+.reveal .slides section.final-slide h1,
+.reveal .slides section.final-slide h2,
+.reveal .slides section.final-slide h3 {
+  color: var(--hutton-white) !important;
+}
+.reveal .slides section.final-slide ul li::before {
+  color: var(--hutton-white) !important;
+}
+.reveal .slides section.final-slide a {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   UPDATED: title-slide — the deck's opening/title page style.
+   This REPLACES the old, purely decor-driven title-slide look
+   (top banner + bottom-left wedge + middle-right logo, shown
+   via a now-removed isTitle branch in updateDecor()) with a
+   design adapted from a reference conference deck.
+
+   CAUTION for anyone syncing this index.html into the other
+   day_XX/session_XX decks via copy-deck.bat: those decks'
+   existing presentation.md files still just write plain
+   `# Title` / `## Subtitle` for their title-slide, none of the
+   markup below. The gradient footer bar and the green rule will
+   still show automatically (see below), but they'll be missing
+   the accent bar, author/affiliation lines, meta line and logo
+   strip until their markdown is updated to match.
+
+   Unlike the rest of this deck's slide styles, title-slide's
+   logo strip and background image live directly in the slide's
+   own markup instead of the shared viewport-pinned decor-*
+   elements. Two things are automatic and need NO markup at all:
+     - the gradient footer bar: a ::after pseudo-element on
+       section.title-slide itself (see below), not a manual
+       <div class="slide-footer">.
+     - the green rule above the author list: a border-top on
+       .author-list itself, not a manual <hr class="h-rule">.
+   The top-right corner logo is likewise automatic -- it reuses
+   the same shared .decor-top-right pinned decor as every other
+   slide (see the isTitle branch below), so it looks identical
+   across the whole deck rather than having its own one-off
+   size/position. So markdown authors only need to write:
+     <div class="title-accent"></div>
+     # Title
+     <!-- .element: class="title-main" -->
+     <p class="title-sub">...</p>
+     <p class="author-list">...</p>
+     <p class="affil">...</p>
+     <p class="title-meta">...</p>
+     <div class="logo-strip"> <div class="logo-box"><img ...></div> ... </div>
+   ========================================================= */
+.logo-strip {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.logo-box {
+  padding: 5px 5px;
+}
+/* Accent bar above the title, and the title's own line-height/margin,
+   are both automatic -- targeted straight at the title-slide's own
+   h1, so markdown authors don't need <div class="title-accent"></div>
+   OR the <!-- .element: class="title-main" --> comment; a plain
+   "# Title" is enough. .title-accent/.title-main are kept below as
+   optional utilities in case anyone wants either one elsewhere
+   (e.g. on a non-heading element). */
+.reveal .slides section.title-slide h1::before {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 5px;
+  background: var(--hutton-green);
+  border-radius: 2px;
+  margin-bottom: 0.5em;
+}
+.reveal .slides section.title-slide h1 {
+  line-height: 1.25;
+  margin: 0.6em 0 8px 0;
+}
+.title-accent {
+  width: 60px;
+  height: 5px;
+  background: var(--hutton-green);
+  border-radius: 2px;
+}
+.title-main {
+  line-height: 1.25;
+  margin: 0.6em 0 8px 0;
+}
+/* Subtitle styling is available two ways: write a plain ## heading
+   (recommended -- see the slide-specific h2 rule further down), or
+   use this .title-sub class on a <p> if you want the same look
+   without it being a heading. */
+.title-sub {
+  font-size: 1.2em;
+  color: var(--hutton-green);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.title-meta {
+  font-size: 0.8em;
+  font-weight: 700;
+  color: var(--hutton-blue);
+  text-align: right;
+  line-height: 1.7;
+  margin: 0 0.8em 0 0;
+  padding: 10% 0 0 0;
+}
+/* The gradient rule is automatic -- a border on the title-slide's own h2
+   (see above), not on .author-list -- so it shows up as soon as a
+   subtitle exists, regardless of whether an author-list is present.
+   .h-rule is still defined below as an optional utility if anyone wants
+   an extra manual divider elsewhere. */
+.author-list {
+  font-size: 0.85em;
+  color: var(--hutton-grey);
+  margin-top: 14px;
+  padding-top: 3%;
+  line-height: 1.8;
+}
+.affil {
+  font-size: 0.72em;
+  color: var(--hutton-grey);
+  opacity: 0.8;
+}
+.h-rule {
+  border: none;
+  border-top: 2px solid transparent;
+  border-image: linear-gradient(to right, var(--hutton-green), var(--hutton-blue), var(--hutton-purple)) 1;
+  margin: 14px 0;
+}
+/* Cover-image ribbon is NOT a background on the slide <section> --
+   a section's own box gets vertically re-centered by reveal whenever
+   its content is shorter than the internal 960x700 slide area, which
+   would drag a section-attached background around with it. Instead
+   it's the shared, viewport-pinned .decor-title-cover div (see the
+   "pinned decorative graphics" block near the top of this stylesheet
+   and the isTitle branch in updateDecor() below) -- same technique as
+   .decor-bottom on the other slide styles, so it stays flush to the
+   real screen's bottom-right corner regardless of content height. */
+
+/* =========================================================
+   NEW: timeline-tree — daily-plan overview. Horizontal axis
+   = the 5 days; each day grows a vertical branch of sessions.
+   Markdown authors build it from nested divs, see cheatsheet:
+     <div class="timeline-tree">
+       <div class="timeline-day"> ... </div> (one per day)
+     </div>
+   Day nodes are fixed-size circles -- give each one a
+   bg-hutton-* utility class (see hutton-colours.css) to tell
+   the days apart; label text (e.g. "D1") sizes itself inside.
+   ========================================================= */
+.timeline-tree {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  width: 100%;
+  margin-top: 0.9em;
+  padding-top: 1.6em;
+  border-top: 2px solid var(--hutton-green);
+}
+.timeline-tree::before {
+  content: "";
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 3.5em;
+  height: 3px;
+  background: var(--hutton-grey);
+  opacity: 0.5;
+}
+.timeline-day {
+  flex: 1 1 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0.3em;
+}
+.timeline-day-node {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5em;
+  height: 4.5em;
+  border-radius: 50%;
+  color: var(--hutton-white) !important;
+  font-weight: 700;
+  font-size: 1em;
+  text-decoration: none !important;
+  overflow: hidden;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.timeline-day-node:hover {
+  filter: brightness(0.88);
+}
+/* Hovering anywhere in the day's own column (the circle, the
+   connecting line, or a session that's already visible) keeps this
+   rule active -- .timeline-day spans the circle + the whole branch
+   below it as one continuous box, with no gap for the cursor to slip
+   through while moving from the circle down toward a session. That's
+   what makes the reveal-on-hover feel stable instead of flickering. */
+.timeline-day:hover .timeline-day-node {
+  transform: scale(1.3);
+}
+.timeline-branch {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: 0.6em;
+  padding-top: 0.1em;
+}
+.timeline-branch::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0.55em;
+  left: 50%;
+  width: 2px;
+  background: var(--hutton-grey);
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 0.15s ease;
+}
+/* Same hover target as the sessions themselves -- see note below. */
+.timeline-day:hover .timeline-branch::before {
+  opacity: 0.35;
+}
+.timeline-session-node {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 9.5em;
+  font-size: 0.58em;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--hutton-grey) !important;
+  background: var(--hutton-white);
+  border-radius: 10px;
+  padding: 0.5em 0.7em;
+  text-decoration: none !important;
+  white-space: normal;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+/* Revealed by hovering anywhere in the parent .timeline-day column --
+   see the .timeline-day-node transform rule above for why the hover
+   target is the whole day column and not the node/session individually. */
+.timeline-day:hover .timeline-session-node {
+  opacity: 1;
+  pointer-events: auto;
+}
+.timeline-session-node:hover {
+  color: var(--hutton-white) !important;
+}
+/* Hover colour matches the colour of the day it belongs to -- keyed off
+   the bg-hutton-* utility class already sitting on that day's node. */
+.timeline-day-node.bg-hutton-purple    ~ .timeline-branch .timeline-session-node:hover { background: var(--hutton-purple); }
+.timeline-day-node.bg-hutton-green     ~ .timeline-branch .timeline-session-node:hover { background: var(--hutton-green); }
+.timeline-day-node.bg-hutton-blue      ~ .timeline-branch .timeline-session-node:hover { background: var(--hutton-blue); }
+.timeline-day-node.bg-hutton-orange    ~ .timeline-branch .timeline-session-node:hover { background: var(--hutton-orange); }
+.timeline-day-node.bg-hutton-dark-blue ~ .timeline-branch .timeline-session-node:hover { background: var(--hutton-dark-blue); }
+
+</style>
+</head>
+<body>
+  <!-- On-screen "back to the course plan" button. Present on every slide
+       (it's pinned outside the .slides container) except the course-plan
+       slide itself and the deck's own title slide -- see the isTimeline/
+       isTitle branches in updateDecor() below. -->
+  <button class="deck-back-button" type="button" onclick="goToCoursePlan();" aria-label="Go back to the course plan">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+    Back
+  </button>
+  <script>
+    // This index.html is synced as-is into day_XX/ and day_XX/session_XX/
+    // (see copy-deck.bat), so the number of "../" needed to reach the root
+    // deck's index.html depends on how deep the current copy sits -- work
+    // that out from the URL rather than hard-coding a path. The course-plan
+    // slide has a stable id="course-plan" (see presentation.md) so this
+    // still works even if slides are reordered.
+    function goToCoursePlan() {
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      if (/\.[a-zA-Z0-9]+$/.test(parts[parts.length - 1] || '')) {
+        parts.pop();  // drop the filename (e.g. index.html), keep only directories
+      }
+      const last = parts[parts.length - 1] || '';
+      const secondLast = parts[parts.length - 2] || '';
+      let prefix = '';
+      if (/^session_\d+$/.test(last) && /^day_\d+$/.test(secondLast)) {
+        prefix = '../../';
+      } else if (/^day_\d+$/.test(last)) {
+        prefix = '../';
+      }
+      window.location.href = prefix + 'index.html#/course-plan';
+    }
+  </script>
+
+  <div class="reveal">
+    <div class="slides">
+      <section data-markdown="presentation.md"
+               data-separator="^\s*---\s*$"
+               data-separator-vertical="^\s*--\s*$"
+               data-separator-notes="^Note:"
+               data-charset="utf-8">
+      </section>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://unpkg.com/reveal.js@5/plugin/markdown/markdown.js"></script>
+  <script src="https://unpkg.com/reveal.js@5/plugin/highlight/highlight.js"></script>
+  <script src="https://unpkg.com/reveal.js@5/plugin/math/math.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/reveal.js@5/plugin/notes/notes.js"></script>
+  <script src="https://unpkg.com/reveal.js@5/plugin/search/search.js"></script>
+  <script src="https://unpkg.com/reveal.js@5/plugin/zoom/zoom.js"></script>
+  <script>
+	mermaid.initialize({ 
+	    startOnLoad: false,
+	    theme: 'default',
+	    suppressErrorRendering: true
+	});
+
+	function convertAndRenderMermaid() {
+	    // Convert any unconverted fenced blocks
+	    document.querySelectorAll('code.language-mermaid, code.mermaid').forEach(el => {
+		const div = document.createElement('div');
+		div.className = 'mermaid';
+		div.textContent = el.textContent.trim();
+		el.parentElement.replaceWith(div);
+	    });
+	    // Only run on visible slide to avoid errors on hidden slides
+	    const currentSlide = Reveal.getCurrentSlide();
+	    if (currentSlide) {
+		mermaid.run({ 
+		    querySelector: '.mermaid',
+		    nodes: currentSlide.querySelectorAll('.mermaid')
+		});
+	    }
+	}
+
+	Reveal.initialize({
+	    hash: true,
+	    slideNumber: 'c/t',
+	    plugins: [ RevealMarkdown, RevealHighlight, RevealMath.KaTeX, RevealNotes, RevealSearch, RevealZoom ],
+	    transition: 'slide',       // none/fade/slide/convex/concave/zoom
+   	    transitionSpeed: 'slow',   // default/fast/slow
+            backgroundTransition: 'slide',
+	    highlight: {
+        	beforeHighlight: (hljs, code, language) => {
+            		if (language === 'mermaid') return '';
+            		return code;
+        	}
+    	    }
+	}).then(convertAndRenderMermaid);
+
+	Reveal.on('slidechanged', convertAndRenderMermaid);
+	Reveal.on('ready', updateDecor);
+	Reveal.on('slidechanged', updateDecor);
+    // --- show correct decorations at startup and on slide change ---
+    function updateDecor() {
+      const current = Reveal.getCurrentSlide();
+      const isTitle = current && current.classList.contains('title-slide');
+      const isFinal = current && current.classList.contains('final-slide');
+      const isPause = current && current.classList.contains('pause-slide');
+      const isTimeline = current && current.classList.contains('timeline-slide');
+      const isBib = current && current.classList.contains('bibliography-slide');
+      const isRightImage = current && current.classList.contains('right-image-slide');
+      const isHeroImage = current && current.classList.contains('hero-image');
+      const isSectionPurple = current && current.classList.contains('section-title-purple');
+      const isSectionGreen = current && current.classList.contains('section-title-green');
+      const isSectionBlue = current && current.classList.contains('section-title-blue');
+      const isSection = isSectionPurple || isSectionGreen || isSectionBlue;
+
+      // Lets CSS scope tweaks (back button, nav arrows, and for the
+      // section-*-slide dividers, the full-viewport background colour
+      // itself) to just these slides -- .deck-back-button, .reveal
+      // .controls and .reveal-viewport all live outside the slide
+      // <section>, so a plain descendant selector on the slide itself
+      // can't reach them; a class on <body> can.
+      document.body.classList.toggle('final-slide-active', !!isFinal);
+      document.body.classList.toggle('section-title-purple-active', !!isSectionPurple);
+      document.body.classList.toggle('section-title-green-active', !!isSectionGreen);
+      document.body.classList.toggle('section-title-blue-active', !!isSectionBlue);
+
+      const bodyTop = document.querySelector('.decor-top-right');
+      const bodyTopDark = document.querySelector('.decor-top-right-dark');
+      const bodyBottom = document.querySelector('.decor-bottom');
+      const bodyBottomPurple = document.querySelector('.decor-bottom-purple');
+      const titleCover = document.querySelector('.decor-title-cover');
+      const badges = document.querySelector('.decor-badges');
+      const badgeRow = document.querySelector('.badge-row');
+      const finalTop = document.querySelector('.decor-final-top');
+      const finalLogos = document.querySelector('.decor-final-logos');
+      const bibTop = document.querySelector('.decor-bib-top');
+      const backButton = document.querySelector('.deck-back-button');
+
+      if (isTitle) {
+          // Title slide's logo strip lives inside the slide's own markup
+          // (see the .title-slide CSS block above); the top-right corner
+          // logo reuses the same shared pinned decor as every other slide
+          // for a consistent look, and the cover-image ribbon is likewise
+          // a shared, viewport-pinned decor div (see .decor-title-cover
+          // above) rather than a background on the slide itself. It's the
+          // deck's own landing page, so there's nowhere for "Back" to go.
+          bodyTop.style.display = 'block';
+          bodyTopDark.style.display = 'none';
+          bodyBottom.style.display = 'none';
+          bodyBottomPurple.style.display = 'none';
+          titleCover.style.display = 'block';
+          finalTop.style.display = 'none';
+          finalLogos.style.display = 'none';
+          bibTop.style.display = 'none';
+          badges.style.display = 'none';
+          badgeRow.style.display = 'none';
+          backButton.style.display = 'none';
+      } else if (isFinal) {
+          // Final-slide uses .decor-final-logos (Hutton dark logo + the
+          // two "-reversed" partner logos) instead of the single-logo
+          // .decor-top-right-dark that bibliography-slide uses below.
+          bodyTop.style.display = 'none';
+          bodyBottom.style.display = 'none';
+          bodyBottomPurple.style.display = 'none';
+          titleCover.style.display = 'none';
+          finalTop.style.display = 'block';
+          finalLogos.style.display = 'flex';
+          bibTop.style.display = 'none';
+          bodyTopDark.style.display = 'none';
+          badges.style.display = 'block';
+          badgeRow.style.display = 'flex';
+          backButton.style.display = 'flex';
+      } else if (isPause) {
+          // Pause slide is a deliberately bare, humorous "holding" screen --
+          // no institute branding graphics, just the centred content itself.
+          bodyTop.style.display = 'none';
+          bodyBottom.style.display = 'none';
+          bodyBottomPurple.style.display = 'none';
+          titleCover.style.display = 'none';
+          finalTop.style.display = 'none';
+          finalLogos.style.display = 'none';
+          bibTop.style.display = 'none';
+          bodyTopDark.style.display = 'none';
+          badges.style.display = 'none';
+          badgeRow.style.display = 'none';
+          backButton.style.display = 'flex';
+      } else if (isBib) {
+          // Bibliography-slide swaps the usual bottom banner for a
+          // top-right graphic (.decor-bib-top, reference-top.png) and
+          // the light logo for the dark variant (.decor-top-right-dark) --
+          // just the single Hutton logo, not the final-slide's 3-logo row.
+          bodyTop.style.display = 'none';
+          bodyTopDark.style.display = 'block';
+          bodyBottom.style.display = 'none';
+          bodyBottomPurple.style.display = 'none';
+          titleCover.style.display = 'none';
+          finalTop.style.display = 'none';
+          finalLogos.style.display = 'none';
+          bibTop.style.display = 'block';
+          badges.style.display = 'none';
+          badgeRow.style.display = 'none';
+          backButton.style.display = 'flex';
+      } else if (isSection) {
+          // Full-bleed section-*-slide divider: the brand-colour fill
+          // itself is handled by the body.section-*-active CSS rules
+          // (see the big comment near those rules) -- this branch just
+          // shows the single dark Hutton logo top-right, same element
+          // bibliography-slide uses, and hides every other decor graphic.
+          bodyTop.style.display = 'none';
+          bodyTopDark.style.display = 'block';
+          bodyBottom.style.display = 'none';
+          bodyBottomPurple.style.display = 'none';
+          titleCover.style.display = 'none';
+          finalTop.style.display = 'none';
+          finalLogos.style.display = 'none';
+          bibTop.style.display = 'none';
+          badges.style.display = 'none';
+          badgeRow.style.display = 'none';
+          backButton.style.display = 'flex';
+      } else if (isHeroImage) {
+          // hero-image is deliberately decoration-free -- no top-right
+          // logo, no bottom banner -- so the images are the only thing
+          // on screen besides the heading and the Back button.
+          bodyTop.style.display = 'none';
+          bodyTopDark.style.display = 'none';
+          bodyBottom.style.display = 'none';
+          bodyBottomPurple.style.display = 'none';
+          titleCover.style.display = 'none';
+          finalTop.style.display = 'none';
+          finalLogos.style.display = 'none';
+          bibTop.style.display = 'none';
+          badges.style.display = 'none';
+          badgeRow.style.display = 'none';
+          backButton.style.display = 'flex';
+      } else {
+          // body slides (also covers right-image-slide, left-image-slide,
+          // timeline-slide -- they're "based on the default style"). The
+          // timeline-slide is itself the destination the Back button
+          // links to (see .deck-back-button below), so showing "Back"
+          // there would just be a link to itself -- hide it there
+          // specifically. right-image-slide gets the purple-toned bottom
+          // banner instead of the plain one everything else here uses.
+          bodyTop.style.display = 'block';
+          bodyBottom.style.display = isRightImage ? 'none' : 'block';
+          bodyBottomPurple.style.display = isRightImage ? 'block' : 'none';
+          titleCover.style.display = 'none';
+          finalTop.style.display = 'none';
+          finalLogos.style.display = 'none';
+          bibTop.style.display = 'none';
+          bodyTopDark.style.display = 'none';
+          badges.style.display = 'none';
+          badgeRow.style.display = 'none';
+          backButton.style.display = isTimeline ? 'none' : 'flex';
+      }
+    }
+
+    Reveal.on('ready', updateDecor);          // run once at load
+    Reveal.on('slidechanged', updateDecor);   // run on every change
+
+    // =========================================================
+    // UPDATED: pause-slide countdown timer
+    // A pause-slide's timer is entirely optional -- only set a duration
+    // via a per-slide markdown attribute if you want a countdown shown:
+    //   <!-- .slide: class="pause-slide" data-time="3:00" -->
+    // data-time accepts "M:SS" or a plain number of seconds. Omit
+    // data-time (or leave it empty) and no timer is displayed at all,
+    // even if the slide still has a <div class="pause-timer"></div> --
+    // no silent 5-minute default. The slide's own markdown content
+    // supplies the humorous message; this script only drives the
+    // countdown display.
+    // =========================================================
+    let pauseTimerInterval = null;
+
+    function clearPauseTimer() {
+      if (pauseTimerInterval) {
+        clearInterval(pauseTimerInterval);
+        pauseTimerInterval = null;
+      }
+    }
+
+    function formatCountdown(totalSeconds) {
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    function parseTimeAttr(raw) {
+      if (raw.includes(':')) {
+        const [m, s] = raw.split(':').map(Number);
+        return (m || 0) * 60 + (s || 0);
+      }
+      return parseInt(raw, 10) || 0;
+    }
+
+    function startPauseTimer(slide) {
+      clearPauseTimer();
+      const timerEl = slide.querySelector('.pause-timer');
+      if (!timerEl) return;
+
+      const raw = slide.getAttribute('data-time');
+      if (!raw) {
+        // No data-time attribute (or explicitly empty) -- no timer.
+        timerEl.style.display = 'none';
+        return;
+      }
+      timerEl.style.display = '';
+
+      let remaining = parseTimeAttr(raw);
+      timerEl.textContent = formatCountdown(remaining);
+
+      pauseTimerInterval = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          timerEl.textContent = 'Any moment now…';
+          clearPauseTimer();
+          return;
+        }
+        timerEl.textContent = formatCountdown(remaining);
+      }, 1000);
+    }
+
+    function updatePauseSlide() {
+      const current = Reveal.getCurrentSlide();
+      if (current && current.classList.contains('pause-slide')) {
+        startPauseTimer(current);
+      } else {
+        clearPauseTimer();
+      }
+    }
+
+    Reveal.on('ready', updatePauseSlide);
+    Reveal.on('slidechanged', updatePauseSlide);
+  </script>
+
+  <!-- pinned decorations -->
+  <div class="decor-title-cover" aria-hidden="true"></div>
+  <div class="decor-bottom" aria-hidden="true"></div>
+  <div class="decor-bottom-purple" aria-hidden="true"></div>
+  <div class="decor-top-right" aria-hidden="true"></div>
+  <div class="decor-top-right-dark" aria-hidden="true"></div>
+  <div class="decor-final-top" aria-hidden="true"></div>
+  <div class="decor-final-logos" aria-hidden="true">
+    <img src="hutton/hutton-logo-dark.png" alt="">
+    <img src="hutton/Binn+Blue-reversed.webp" alt="">
+    <img src="hutton/essa-logo-reversed.png" alt="">
+  </div>
+  <div class="decor-bib-top" aria-hidden="true"></div>
+  <div class="decor-badges" aria-hidden="true"></div>
+  <div class="badge-row" aria-hidden="true">
+    <div></div><div></div><div></div><div></div><div></div><div></div>
+  </div>
+</body>
+</html>
